@@ -59,7 +59,7 @@ Ekstensi ini dibangun menggunakan arsitektur Google Chrome Extensions Manifest V
 
 ### Fase 4: Integrasi Google Gemini API
 - [ ] Menyusun fungsi asynchronous `fetchGeminiAnswer(base64Image)` di dalam `background.js`.
-- [ ] Menggunakan endpoint resmi Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AQ.Ab8RN6KIXXyyFBzPnt0VI5JkTGa1yzbkxShlWYUa1dp-AQUa0A`).
+- [ ] Menggunakan endpoint resmi Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=API_GEMINI`).
 - [ ] Mengonstruksi JSON payload dengan format multimodal yang tepat (menyertakan objek `inlineData` untuk gambar Base64 dan `text` untuk sistem prompt).
 - [ ] Menambahkan sistem prompt internal (System Instruction), misal: *"Kamu adalah asisten ujian virtual. Jawablah soal pada gambar ini secara instan, singkat, padat, dan langsung ke inti jawaban/opsi yang benar tanpa bertele-tele."*
 - [ ] Mengirimkan teks respons kembali ke Content Script melalui callback message passing.
