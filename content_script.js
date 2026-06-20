@@ -198,10 +198,9 @@ function showAnswer(text) {
   answerBox.style.cssText = `
     position: fixed; top: 20px; right: 20px; z-index: 2147483647;
     max-width: 400px; padding: 16px 20px; border-radius: 12px;
-    background: ${dark ? 'rgba(30,30,50,0.92)' : 'rgba(255,255,255,0.92)'};
+    background: #ffffff;
     border: 1px solid ${dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'};
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    color: ${dark ? '#e0e0e0' : '#1a1a2e'};
+    color: #000000;
     font-family: system-ui, sans-serif;
     font-size: 14px; line-height: 1.5; cursor: move;
     user-select: none;
