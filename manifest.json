@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Answ",
+  "version": "0.1.0",
+  "description": "Answ — AI answer solver.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "commands": {
+    "capture-question": {
+      "suggested_key": {
+        "default": "Alt+X"
+      },
+      "description": "Capture soal untuk dijawab AI"
+    }
+  },
+  "action": {
+    "default_title": "Answ — klik untuk mulai"
+  }
+}
