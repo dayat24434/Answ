@@ -1,0 +1,8 @@
+#stealth-answer {
+  transition: opacity 0.2s ease;
+}
+
+#stealth-selection {
+  pointer-events: none;
+  box-sizing: border-box;
+}
