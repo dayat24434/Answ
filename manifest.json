@@ -10,7 +10,8 @@
     "tabs"
   ],
   "host_permissions": [
-    "https://generativelanguage.googleapis.com/*"
+    "https://generativelanguage.googleapis.com/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
@@ -22,14 +23,6 @@
       "css": ["content.css"]
     }
   ],
-  "commands": {
-    "capture-question": {
-      "suggested_key": {
-        "default": "Alt+X"
-      },
-      "description": "Capture soal untuk dijawab AI"
-    }
-  },
   "action": {
     "default_title": "Answ — klik untuk mulai"
   }

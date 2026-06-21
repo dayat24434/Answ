@@ -1,12 +1,13 @@
 const API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
 let API_KEYS = [];
-let keyIndex = 0;
+let keysInUse = new Set();
 
-function getNextKey() {
-  if (API_KEYS.length === 0) return '';
-  const key = API_KEYS[keyIndex];
-  keyIndex = (keyIndex + 1) % API_KEYS.length;
-  return key;
+/** Cari API key yang sedang tidak dipakai oleh pengguna lain */
+function findAvailableKey() {
+  for (const key of API_KEYS) {
+    if (!keysInUse.has(key)) return key;
+  }
+  return null;
 }
 
 async function loadApiKeys() {
@@ -26,23 +27,26 @@ async function startSelection() {
   try {
     await chrome.tabs.sendMessage(tab.id, { type: 'START_SELECTION' });
   } catch {
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ['content_script.js']
-    });
-    await chrome.scripting.insertCSS({
-      target: { tabId: tab.id },
-      files: ['content.css']
-    });
-    chrome.tabs.sendMessage(tab.id, { type: 'START_SELECTION' }).catch(() => {});
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content_script.js']
+      });
+      await chrome.scripting.insertCSS({
+        target: { tabId: tab.id },
+        files: ['content.css']
+      });
+      setTimeout(() => {
+        chrome.tabs.sendMessage(tab.id, { type: 'START_SELECTION' }).catch(() => {});
+      }, 50);
+    } catch (e) {
+      console.error('Gagal inject content script:', e);
+    }
   }
 }
 
 chrome.action.onClicked.addListener(startSelection);
 
-chrome.commands.onCommand.addListener((command) => {
-  if (command === 'capture-question') startSelection();
-});
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'CAPTURE_AND_SOLVE') {
@@ -85,26 +89,39 @@ async function blobToBase64(blob) {
 
 async function fetchGeminiAnswer(base64Image) {
   if (API_KEYS.length === 0) await loadApiKeys();
-  const maxTries = Math.max(API_KEYS.length, 1);
-  for (let attempt = 0; attempt < maxTries; attempt++) {
-    const key = getNextKey();
-    if (!key) break;
-    const response = await fetch(`${API_URL}?key=${key}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            { text: 'Kamu adalah asisten ujian virtual. Jawablah soal pada gambar ini secara instan, singkat, padat, dan langsung ke inti jawaban/opsi yang benar tanpa bertele-tele.' },
-            { inline_data: { mime_type: 'image/png', data: base64Image } }
-          ]
-        }]
-      })
-    });
 
-    if (response.ok) {
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Tidak ada jawaban.';
+  if (API_KEYS.length === 0) {
+    throw new Error('Tidak ada API key terdaftar. Periksa api.json.');
+  }
+
+  // Hanya coba key yang sedang tidak dipakai
+  const keysToTry = API_KEYS.filter(k => !keysInUse.has(k));
+  if (keysToTry.length === 0) {
+    throw new Error('Semua API key sedang dipakai pengguna lain. Coba lagi nanti.');
+  }
+
+  for (const key of keysToTry) {
+    keysInUse.add(key); // kunci agar tidak dipakai user lain
+    try {
+      const response = await fetch(`${API_URL}?key=${key}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: 'Kamu adalah asisten ujian virtual. Jawablah soal pada gambar ini secara instan, singkat, padat, dan langsung ke inti jawaban/opsi yang benar tanpa bertele-tele.' },
+              { inline_data: { mime_type: 'image/png', data: base64Image } }
+            ]
+          }]
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Tidak ada jawaban.';
+      }
+    } finally {
+      keysInUse.delete(key); // lepas kunci setelah selesai (sukses/gagal)
     }
   }
   throw new Error('Semua API key gagal.');

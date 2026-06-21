@@ -1,3 +1,8 @@
+if (window.__stealth_ans_initialized) {
+  /* sudah terlanjur di-inject, skip */
+} else {
+  window.__stealth_ans_initialized = true;
+
 let overlay = null;
 let selectionBox = null;
 let startX = 0, startY = 0;
@@ -5,11 +10,24 @@ let isSelecting = false;
 let answerBox = null;
 
 document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Escape') return;
-  if (overlay) {
-    removeOverlay();
-  } else if (answerBox) {
-    closeAnswer();
+  if (e.key === 'Escape') {
+    if (overlay) {
+      removeOverlay();
+    } else if (answerBox) {
+      closeAnswer();
+    }
+    return;
+  }
+
+  // Alt+X — langsung create overlay tanpa perlu service worker / refresh
+  if (e.altKey && (e.key === 'x' || e.key === 'X')) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (overlay) {
+      removeOverlay();
+    } else {
+      createOverlay();
+    }
   }
 });
 
@@ -83,7 +101,7 @@ function isDarkMode() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
-function onMouseUp(e) {
+async function onMouseUp(e) {
   isSelecting = false;
   const x = Math.min(startX, e.clientX);
   const y = Math.min(startY, e.clientY);
@@ -97,23 +115,22 @@ function onMouseUp(e) {
 
   removeOverlay();
 
-  chrome.runtime.sendMessage(
-    { type: 'CAPTURE_AND_SOLVE', coords: { x, y, width: w, height: h } },
-    (response) => {
-      if (response?.success) {
-        showAnswer(response.answer);
-      } else {
-        showAnswer('Error: ' + (response?.error || 'Gagal mendapatkan jawaban.'));
-      }
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: 'CAPTURE_AND_SOLVE', coords: { x, y, width: w, height: h }
+    });
+    if (response?.success) {
+      showAnswer(response.answer);
+    } else {
+      showAnswer('Error: ' + (response?.error || 'Gagal mendapatkan jawaban.'));
     }
-  );
+  } catch (e) {
+    showAnswer('Error: Extension tidak aktif. Reload ekstensi di chrome://extensions lalu refresh halaman ini.');
+  }
 }
 
 function renderMath(text) {
-  const escapeMap = {
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-  };
-  text = text.replace(/[&<>"']/g, c => escapeMap[c]);
+  text = text.replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
 
   text = text.replace(/\$\$(.+?)\$\$/gs, (_, m) => renderLatex(m));
   text = text.replace(/\$(.+?)\$/g, (_, m) => renderLatex(m));
@@ -248,4 +265,6 @@ function makeDraggable(el) {
   document.addEventListener('mouseup', () => {
     isDragging = false;
   });
+}
+
 }
