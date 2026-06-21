@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Answ",
-  "version": "0.1.0",
-  "description": "Answ — AI answer solver.",
+  "version": "0.8.0",
+  "description": "Answ — AI answer solver. Seleksi soal, dapatkan jawaban instan dari AI.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -24,6 +24,7 @@
     }
   ],
   "action": {
-    "default_title": "Answ — klik untuk mulai"
+    "default_title": "Answ — Atur API Key & Mulai Seleksi",
+    "default_popup": "popup.html"
   }
 }

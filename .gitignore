@@ -2,3 +2,5 @@
 config.js
 api.json
 *.local
+
+node_modules/

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Answ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 380px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-badge {
+      width: 30px; height: 30px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: #fff;
+      flex-shrink: 0;
+    }
+    .header-text { flex: 1; }
+    .header-text h1 {
+      font-size: 15px; font-weight: 700; color: #fff;
+      line-height: 1.2;
+    }
+    .header-text .sub {
+      font-size: 11px; color: rgba(255,255,255,0.7);
+    }
+
+    /* ⚡ overall status */
+    .bar-status {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 18px;
+      background: #fff;
+      font-size: 12px; color: #64748b;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .bar-status .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .bar-status .dot.on  { background: #22c55e; }
+    .bar-status .dot.off { background: #ef4444; }
+
+    /* ── Body ── */
+    .body { padding: 12px 18px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* card sections */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.4px; color: #94a3b8; margin-bottom: 8px;
+    }
+
+    /* ── Start button ── */
+    .btn-start {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 10px;
+      border: none; border-radius: 10px;
+      background: #22c55e; color: #fff;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-start:hover  { background: #16a34a; }
+    .btn-start:active { transform: scale(0.97); }
+
+    /* ── Textarea ── */
+    textarea {
+      width: 100%; min-height: 72px;
+      padding: 10px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12.5px;
+      color: #0f172a;
+      background: #f8fafc;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    textarea:focus {
+      border-color: #818cf8;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+    }
+    textarea::placeholder { color: #94a3b8; }
+
+    .hint {
+      font-size: 10.5px; color: #94a3b8; margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .row-btn {
+      display: flex; gap: 6px; margin-top: 8px;
+    }
+    .row-btn .btn { flex: 1; justify-content: center; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 16px;
+      border: none; border-radius: 8px;
+      font-size: 12.5px; font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: #6366f1; color: #fff; }
+    .btn-primary:hover { background: #4f46e5; }
+    .btn-success { background: #22c55e; color: #fff; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-outline { background: transparent; color: #6366f1; border: 1.5px solid #6366f1; }
+    .btn-outline:hover { background: rgba(99,102,241,0.06); }
+    .btn-danger { background: #fef2f2; color: #ef4444; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-xs { padding: 4px 9px; font-size: 10.5px; border-radius: 6px; }
+
+    /* ── Key list ── */
+    .key-counter {
+      font-size: 11px; color: #94a3b8; margin-bottom: 6px;
+    }
+    .key-list { display: flex; flex-direction: column; gap: 5px; }
+    .key-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      transition: border-color 0.15s;
+    }
+    .key-item:hover { border-color: #cbd5e1; }
+
+    .key-item .status-dot-item {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .key-item .status-dot-item.idle     { background: #cbd5e1; }
+    .key-item .status-dot-item.checking { background: #f59e0b; animation: pulse 0.8s infinite; }
+    .key-item .status-dot-item.valid    { background: #22c55e; }
+    .key-item .status-dot-item.invalid  { background: #ef4444; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.4; }
+    }
+
+    .key-item .key-text {
+      flex: 1; min-width: 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11.5px; color: #475569;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .key-item .actions {
+      display: flex; gap: 4px; flex-shrink: 0;
+    }
+
+    .empty-state {
+      text-align: center; padding: 18px 0 10px;
+      color: #94a3b8;
+    }
+    .empty-state .ico { font-size: 24px; margin-bottom: 4px; }
+    .empty-state p { font-size: 12.5px; }
+    .empty-state .sub { font-size: 10.5px; margin-top: 2px; color: #b0b8c4; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+      padding: 7px 16px; border-radius: 8px;
+      font-size: 12px; font-weight: 500;
+      color: #fff; z-index: 100;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #22c55e; }
+    .toast.error   { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-badge">A</div>
+    <div class="header-text">
+      <h1>Answ</h1>
+      <div class="sub">AI Answer Solver</div>
+    </div>
+  </div>
+
+  <div class="bar-status" id="statusBar">
+    <span class="dot off" id="statusDot"></span>
+    <span id="statusText">Memuat…</span>
+  </div>
+
+  <div class="body">
+    <!-- Start -->
+    <button class="btn-start" id="btnStart">
+      <span>&#9654;</span> Mulai Seleksi
+    </button>
+
+    <!-- Add keys -->
+    <div class="card">
+      <div class="card-label">&#43; Tambah API Key</div>
+      <textarea id="keyInput" placeholder="Paste API key Gemini&#10;satu per baris…"></textarea>
+      <div class="hint">Setiap baris = satu key. Tidak ada batasan jumlah.</div>
+      <div class="row-btn">
+        <button class="btn btn-primary" id="btnSave">Simpan</button>
+      </div>
+    </div>
+
+    <!-- Saved keys -->
+    <div class="card">
+      <div class="card-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>&#128273; Key Tersimpan</span>
+        <span style="display:flex;gap:4px">
+          <button class="btn btn-outline btn-xs" id="btnCheckAll" style="display:none">Cek Semua</button>
+          <button class="btn btn-danger btn-xs" id="btnDeleteAll" style="display:none">Hapus Semua</button>
+        </span>
+      </div>
+      <div class="key-counter" id="keyCount">0 key</div>
+      <div class="key-list" id="keyList">
+        <div class="empty-state">
+          <div class="ico">&#128274;</div>
+          <p>Belum ada API key</p>
+          <div class="sub">Tambahkan key di atas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

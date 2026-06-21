@@ -42,6 +42,9 @@ chrome.runtime.onMessage.addListener((request) => {
 });
 
 function createOverlay() {
+  // Tutup jawaban sebelumnya agar tidak interferensi dengan overlay baru
+  closeAnswer();
+
   overlay = document.createElement('div');
   overlay.id = 'stealth-overlay';
   overlay.style.cssText = `
